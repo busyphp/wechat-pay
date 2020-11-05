@@ -16,7 +16,7 @@ use BusyPHP\wechat\pay\WeChatPayException;
  * @version $Id: 2018-04-15 上午10:58 WeChatAppPayCreate.php busy^life $
  * @see https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=9_1
  */
-class WechatMiniPayCreate extends WeChatPay implements PayCreate
+class WeChatMiniPayCreate extends WeChatPay implements PayCreate
 {
     protected $apiUrl = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
     

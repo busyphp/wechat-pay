@@ -14,7 +14,7 @@ use BusyPHP\wechat\pay\WeChatPayException;
  * @version $Id: 2020/7/8 下午7:20 下午 WeChatJSPayQueryOrder.php $
  * @see https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=9_2
  */
-class WechatMiniPayQueryOrder extends WeChatPay
+class WeChatMiniPayQueryOrder extends WeChatPay
 {
     /**
      * 密钥

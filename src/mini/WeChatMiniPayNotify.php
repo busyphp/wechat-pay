@@ -16,7 +16,7 @@ use Throwable;
  * @version $Id: 2020/7/8 下午7:18 下午 WeChatJSPayNotify.php $
  * @see https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=9_7&index=8
  */
-class WechatMiniPayNotify extends WeChatPay implements PayNotify
+class WeChatMiniPayNotify extends WeChatPay implements PayNotify
 {
     protected $requestParams = [];
     
@@ -63,7 +63,7 @@ class WechatMiniPayNotify extends WeChatPay implements PayNotify
             throw new WeChatPayException("签名错误: {$sign}, {$this->requestParams['sign']}");
         }
         
-        $queryOrder = new WechatMiniPayQueryOrder();
+        $queryOrder = new WeChatMiniPayQueryOrder();
         $queryOrder->setPayTradeNo($this->requestParams['transaction_id']);
         $info = $queryOrder->request();
         if ($info['trade_state'] != 'SUCCESS') {
