@@ -12,8 +12,8 @@
 	"require"     : {
 		"php"                 : ">=7.1.0",
 		"busyphp/busyphp"     : "^3.0",
-		"busyphp/trade"       : "^1.0",
-		"busyphp/wechat-base" : "^1.0",
+		"busyphp/trade"       : "^1.0.2",
+		"busyphp/wechat-base" : "^1.0.2",
 		"ext-json"            : "*",
 		"ext-libxml"          : "*",
 		"ext-simplexml"       : "*",
