@@ -6,7 +6,7 @@ use BusyPHP\helper\net\Http;
 use BusyPHP\helper\util\Str;
 use BusyPHP\trade\interfaces\PayRefund;
 use BusyPHP\trade\interfaces\PayRefundResult;
-use BusyPHP\trade\model\pay\TradePayField;
+use BusyPHP\trade\model\refund\TradeRefundField;
 use BusyPHP\wechat\pay\WeChatPayException;
 use BusyPHP\wechat\pay\WeChatPay;
 
@@ -19,23 +19,7 @@ use BusyPHP\wechat\pay\WeChatPay;
  */
 class WeChatJSPayRefund extends WeChatPay implements PayRefund
 {
-    /**
-     * 密钥
-     * @var string
-     */
-    protected $secret;
-    
     protected $apiUrl = 'https://api.mch.weixin.qq.com/secapi/pay/refund';
-    
-    
-    /**
-     * 获取配置名称
-     * @return string
-     */
-    protected function getConfigKey()
-    {
-        return 'js';
-    }
     
     
     /**
@@ -49,49 +33,31 @@ class WeChatJSPayRefund extends WeChatPay implements PayRefund
         
         $this->params['appid']  = $this->appId;
         $this->params['mch_id'] = $this->mchId;
-        $this->secret           = $this->payKey;
     }
     
     
     /**
-     * 设置平台交易订单数据对象
-     * @param TradePayField $info
+     * 获取配置名称
+     * @return string
      */
-    public function setTradeInfo(TradePayField $info)
+    protected function getConfigKey()
     {
+        return 'js';
+    }
+    
+    
+    /**
+     * 设置平台退款订单数据对象
+     * @param TradeRefundField $info
+     */
+    public function setTradeRefundInfo(TradeRefundField $info)
+    {
+        $this->params['out_refund_no']  = $info->refundNo;
         $this->params['out_trade_no']   = $info->payTradeNo;
-        $this->params['transaction_id'] = $info->apiTradeNo;
-        $this->params['total_fee']      = intval($info->apiPrice * 100);
-    }
-    
-    
-    /**
-     * 设置退款单号
-     * @param string $refundNo
-     */
-    public function setRefundTradeNo($refundNo)
-    {
-        $this->params['out_refund_no'] = trim($refundNo);
-    }
-    
-    
-    /**
-     * 设置要申请退款的金额
-     * @param float $refundPrice 精确到小数点2位
-     */
-    public function setRefundPrice($refundPrice)
-    {
-        $this->params['refund_fee'] = intval($refundPrice * 100);
-    }
-    
-    
-    /**
-     * 设置退款原因
-     * @param string $reason
-     */
-    public function setRefundReason($reason)
-    {
-        $this->params['refund_desc'] = trim($reason);
+        $this->params['transaction_id'] = $info->payApiTradeNo;
+        $this->params['total_fee']      = intval($info->payPrice * 100);
+        $this->params['refund_fee']     = intval($info->refundPrice * 100);
+        $this->params['refund_desc']    = $info->remark;
     }
     
     
@@ -114,7 +80,7 @@ class WeChatJSPayRefund extends WeChatPay implements PayRefund
     {
         $this->params['nonce_str'] = Str::random(32);
         $this->params['sign_type'] = 'MD5';
-        $this->params['sign']      = static::createSign(static::createSignTemp($this->params, 'sign'), $this->secret);
+        $this->params['sign']      = static::createSign(static::createSignTemp($this->params, 'sign'), $this->payKey);
         
         $http = new Http();
         $http->setOpt(CURLOPT_SSLCERT, $this->sslCertPath);
@@ -124,12 +90,7 @@ class WeChatJSPayRefund extends WeChatPay implements PayRefund
         $result = parent::request($http);
         
         $res = new PayRefundResult();
-        $res->setRefundTradeNo($result['out_refund_no']);
-        $res->setApiPayTradeNo($result['transaction_id']);
-        $res->setPayTradeNo($result['out_trade_no']);
-        $res->setRefundPrice($result['refund_fee'] / 100);
         $res->setApiRefundTradeNo($result['refund_id']);
-        
         
         return $res;
     }

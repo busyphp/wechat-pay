@@ -10,7 +10,7 @@ use think\Response;
 use Throwable;
 
 /**
- * 微信H5支付退款异步通知处理类
+ * 微信JSSDK支付退款异步通知处理类
  * @author busy^life <busy.life@qq.com>
  * @copyright (c) 2015--2019 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
  * @version $Id: 2020/7/8 下午7:24 下午 WeChatJSPayRefundNotify.php $
@@ -49,15 +49,13 @@ class WeChatJSPayRefundNotify extends WeChatPay implements PayRefundNotify
         $xml                 = $GLOBALS['HTTP_RAW_POST_DATA'];
         $this->requestString = $xml . ', KEY: ' . $key;
         $this->requestParams = self::xmlToArray($xml);
-        $this->refundNo      = $this->requestParams['out_trade_no'];
-        
         
         // 执行aes-256-ecb解密
         $reqInfo = $this->requestParams['req_info'];
         $reqInfo = base64_decode($reqInfo);
+        $reqInfo = openssl_decrypt($reqInfo, 'aes-256-ecb', $key, OPENSSL_RAW_DATA);
+        $reqInfo = self::xmlToArray($reqInfo);
         
-        $reqInfo        = openssl_decrypt($reqInfo, 'aes-256-ecb', $key, OPENSSL_RAW_DATA);
-        $reqInfo        = self::xmlToArray($reqInfo);
         $this->reqInfo  = $reqInfo;
         $this->refundNo = $this->reqInfo['out_refund_no'];
         if (!$this->reqInfo) {
@@ -73,20 +71,16 @@ class WeChatJSPayRefundNotify extends WeChatPay implements PayRefundNotify
     public function notify() : PayRefundNotifyResult
     {
         $res = new PayRefundNotifyResult();
+        $res->setRefundNo($this->refundNo);
+        $res->setApiRefundNo($this->reqInfo['refund_id']);
         $res->setPayTradeNo($this->reqInfo['out_trade_no']);
-        $res->setRefundTradeNo($this->refundNo);
-        $res->setApiRefundTradeNo($this->reqInfo['refund_id']);
-        $res->setRefundPrice($this->reqInfo['refund_fee'] / 100);
+        $res->setPayApiTradeNo($this->reqInfo['transaction_id']);
         $res->setRefundAccount($this->reqInfo['refund_recv_accout']);
-        $res->setPrice($this->reqInfo['total_fee'] / 100);
-        $res->setApiPayTradeNo($this->reqInfo['transaction_id']);
         $res->setStatus(true);
         
         if ($this->reqInfo['refund_status'] != 'SUCCESS') {
             $res->setStatus(false);
             $res->setErrMsg($this->reqInfo['refund_status'] == 'REFUNDCLOSE' ? '退款关闭' : '退款异常');
-        } else {
-            $res->setSuccessTime(strtotime($this->reqInfo['success_time']));
         }
         
         return $res;
@@ -124,31 +118,11 @@ class WeChatJSPayRefundNotify extends WeChatPay implements PayRefundNotify
     
     
     /**
-     * 获取请求参数
-     * @return array
-     */
-    public function getRequestParams()
-    {
-        return $this->requestParams;
-    }
-    
-    
-    /**
      * 获取请求参数字符
      * @return string
      */
     public function getRequestString()
     {
         return $this->requestString;
-    }
-    
-    
-    /**
-     * 获取退款单号
-     * @return string
-     */
-    public function getRefundTradeNo()
-    {
-        return $this->refundNo;
     }
 }
