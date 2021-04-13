@@ -90,7 +90,7 @@ class WeChatJSPayRefund extends WeChatPay implements PayRefund
         $result = parent::request($http);
         
         $res = new PayRefundResult();
-        $res->setApiRefundTradeNo($result['refund_id']);
+        $res->setApiRefundNo($result['refund_id']);
         
         return $res;
     }
