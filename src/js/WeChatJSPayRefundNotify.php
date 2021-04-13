@@ -46,7 +46,7 @@ class WeChatJSPayRefundNotify extends WeChatPay implements PayRefundNotify
         parent::__construct();
         
         $key                 = strtolower(md5($this->payKey));
-        $xml                 = $GLOBALS['HTTP_RAW_POST_DATA'];
+        $xml                 = file_get_contents('php://input');
         $this->requestString = $xml . ', KEY: ' . $key;
         $this->requestParams = self::xmlToArray($xml);
         
