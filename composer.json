@@ -1,19 +1,23 @@
 {
 	"name"        : "busyphp/wechat-pay",
 	"type"        : "library",
-	"description" : "",
+	"description" : "用于BusyPHP的微信支付，支持公众号端、H5端、APP端、native端支付/退款",
+	"keywords"    : [
+		"微信支付",
+		"WeChat Pay"
+	],
+	"homepage"    : "http://www.harter.cn/?form=BusyPHP&plugin=busyphp/wechat-pay",
 	"authors"     : [
 		{
 			"name"  : "busy^life",
 			"email" : "busy.life@qq.com"
 		}
 	],
-	"license"     : "Apache-2.0",
+	"license"     : "CC-BY-NC-4.0",
 	"require"     : {
 		"php"                 : ">=7.1.0",
-		"busyphp/busyphp"     : "^3.0.5",
-		"busyphp/trade"       : "^1.0.3",
-		"busyphp/wechat-base" : "^1.0.3",
+		"busyphp/trade"       : "^2.0",
+		"busyphp/wechat-base" : "^2.0",
 		"ext-json"            : "*",
 		"ext-libxml"          : "*",
 		"ext-simplexml"       : "*",
@@ -30,5 +34,12 @@
 	},
 	"config"      : {
 		"preferred-install" : "dist"
+	},
+	"extra"       : {
+		"busyphp" : {
+			"manager" : {
+				"name" : "微信支付模块"
+			}
+		}
 	}
 }

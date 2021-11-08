@@ -2,18 +2,27 @@
 
 namespace BusyPHP\wechat\pay;
 
-use BusyPHP\helper\net\Http;
-use BusyPHP\wechat\WeChat;
+use BusyPHP\App;
+use BusyPHP\helper\HttpHelper;
+use BusyPHP\Request;
+use BusyPHP\trade\defines\PayType;
+use BusyPHP\wechat\pay\js\WeChatJSPayCreate;
+use BusyPHP\wechat\pay\js\WeChatJSPayNotify;
+use BusyPHP\wechat\pay\js\WeChatJSPayRefund;
+use BusyPHP\wechat\pay\js\WeChatJSPayRefundNotify;
+use BusyPHP\wechat\WeChatConfig;
 use Throwable;
 
 /**
  * 微信支付基本类
  * @author busy^life <busy.life@qq.com>
- * @copyright (c) 2015--2019 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
- * @version $Id: 2020/7/8 下午7:07 下午 WeChatPay.php $
+ * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
+ * @version $Id: 2021/11/9 上午12:07 WeChatPay.php $
  */
-abstract class WeChatPay extends WeChat
+abstract class WeChatPay
 {
+    use WeChatConfig;
+    
     /**
      * 请求地址
      * @var string
@@ -68,6 +77,16 @@ abstract class WeChatPay extends WeChat
      */
     protected $type;
     
+    /**
+     * @var App
+     */
+    protected $app;
+    
+    /**
+     * @var Request
+     */
+    protected $request;
+    
     
     /**
      * WeChatPay constructor.
@@ -75,10 +94,10 @@ abstract class WeChatPay extends WeChat
      */
     public function __construct()
     {
-        parent::__construct();
-        
         $name = "pay.{$this->getConfigKey()}.";
         
+        $this->app         = App::getInstance();
+        $this->request     = $this->app->request;
         $this->appId       = $this->getConfig($name . 'app_id', '');
         $this->payKey      = $this->getConfig($name . 'pay_key', '');
         $this->mchId       = $this->getConfig($name . 'mch_id', '');
@@ -125,13 +144,13 @@ abstract class WeChatPay extends WeChat
         $http = null;
         if (func_num_args() > 0) {
             $http = func_get_arg(0);
-            if (!$http instanceof Http) {
+            if (!$http instanceof HttpHelper) {
                 $http = null;
             }
         }
         
         try {
-            $result = Http::postXML($this->apiUrl, static::arrayToXml($this->params), $http);
+            $result = HttpHelper::postXML($this->apiUrl, static::arrayToXml($this->params), $http);
         } catch (Throwable $e) {
             throw new WeChatPayException("HTTP请求失败: {$e->getMessage()} [{$e->getCode()}]");
         }
@@ -237,5 +256,27 @@ abstract class WeChatPay extends WeChat
         }
         
         return implode('&', $query);
+    }
+    
+    
+    /**
+     * 获取微信公众号端接口配置
+     * @param string $name 名称
+     * @param string $alias 别名
+     * @param int    $client 客户端类型
+     * @return array
+     */
+    public static function js(?string $name = null, ?string $alias = null, ?int $client = null) : array
+    {
+        return [
+            'name'          => $name ?? '公众号支付',
+            'alias'         => $alias ?? '微信',
+            'client'        => $client ?? PayType::CLIENT_WECHAT,
+            'create'        => WeChatJSPayCreate::class,
+            'notify'        => WeChatJSPayNotify::class,
+            'refund'        => WeChatJSPayRefund::class,
+            'refund_notify' => WeChatJSPayRefundNotify::class,
+            'refund_query'  => AliPcPayRefundQuery::class,
+        ];
     }
 }

@@ -2,15 +2,16 @@
 
 namespace BusyPHP\wechat\pay;
 
-use BusyPHP\exception\AppException;
+use RuntimeException;
+use Throwable;
 
 /**
  * 微信支付异常处理类
  * @author busy^life <busy.life@qq.com>
- * @copyright (c) 2015--2019 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
- * @version $Id: 2020/7/8 下午6:28 下午 WeChatPayException.php $
+ * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
+ * @version $Id: 2021/11/9 上午12:08 WeChatPayException.php $
  */
-class WeChatPayException extends AppException
+class WeChatPayException extends RuntimeException
 {
     private static $errors = [
         'NOAUTH'                => '商户无此接口权限',
@@ -40,18 +41,27 @@ class WeChatPayException extends AppException
         'REFUNDNOTEXIST'        => '退款订单查询失败',
     ];
     
+    /**
+     * @var string
+     */
+    private $errCode;
     
-    public function __construct($message = "", $errCode = '', $code = 0)
+    
+    public function __construct($message, string $errCode = '', int $code = 0, Throwable $previous = null)
     {
-        $error = self::$errors[$errCode] ?? '';
-        $this->setData('WECHAT PAY ERROR', [
-            'Message' => $message,
-            'ErrCode' => $errCode,
-            'Error'   => $error
-        ]);
+        $error         = self::$errors[$errCode] ?? '';
+        $message       = $error ?: $message;
+        $this->errCode = $errCode;
         
-        $message = $error ?: $message;
-        
-        parent::__construct($message, $code);
+        parent::__construct($message, $code, $previous);
+    }
+    
+    
+    /**
+     * @return string
+     */
+    public function getErrCode() : string
+    {
+        return $this->errCode;
     }
 }
