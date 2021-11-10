@@ -63,7 +63,7 @@ class WeChatMiniPayCreate extends WeChatPayCreate
             'signType'  => 'MD5',
         ];
         
-        $params['paySign'] = self::createSign(self::createSignTemp($params, 'sign'), $this->payKey);
+        $params['paySign'] = self::sign(self::temp($params, 'sign'), $this->payKey);
         
         return $params;
     }

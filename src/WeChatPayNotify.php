@@ -52,7 +52,7 @@ abstract class WeChatPayNotify extends WeChatPay implements PayNotify
     public function notify() : PayNotifyResult
     {
         // 验证签名是否合法
-        $sign = static::createSign(static::createSignTemp($this->requestParams, 'sign'), $this->payKey);
+        $sign = static::sign(static::temp($this->requestParams, 'sign'), $this->payKey);
         if ($sign != $this->requestParams['sign']) {
             throw new WeChatPayException("签名错误: {$sign}, {$this->requestParams['sign']}");
         }

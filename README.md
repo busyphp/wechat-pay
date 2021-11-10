@@ -63,7 +63,37 @@ return [
         //    'ssl_cert_path' => app()->getRootPath() . 'config/cert/wechat/apiclient_cert.p12',
         //    'ssl_key_path'  => app()->getRootPath() . 'config/cert/wechat/apiclient_key.pem',
         //    'ca_cert_path'  => app()->getRootPath() . 'config/cert/wechat/rootca.pem',
+        //],
+        
+        
+        // 小程序端支付
+        //'mini'    => [
+        //    'type'          => PayType::WECHAT_APP,
+        //    'app_id'        => '',
+        //    'pay_key'       => '',
+        //    'mch_id'        => '',
+        //    'ssl_cert_path' => app()->getRootPath() . 'config/cert/wechat/apiclient_cert.p12',
+        //    'ssl_key_path'  => app()->getRootPath() . 'config/cert/wechat/apiclient_key.pem',
+        //    'ca_cert_path'  => app()->getRootPath() . 'config/cert/wechat/rootca.pem',
         //]
+    ]
+];
+```
+
+## 配置 `config/extend/trade.php`
+```php
+<?php
+use BusyPHP\trade\defines\PayType;
+use BusyPHP\wechat\pay\WeChatPay;
+
+return [
+    // 支付接口绑定
+    'apis'            => [
+        PayType::WECHAT_JS => WeChatPay::js(),
+        PayType::WECHAT_H5 => WeChatPay::h5(),
+        PayType::WECHAT_APP => WeChatPay::app(),
+        PayType::WECHAT_MINI => WeChatPay::mini(),
+        PayType::WECHAT_NATIVE => WeChatPay::native(),
     ]
 ];
 ```

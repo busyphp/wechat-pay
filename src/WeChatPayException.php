@@ -53,7 +53,7 @@ class WeChatPayException extends RuntimeException
         $message       = $error ?: $message;
         $this->errCode = $errCode;
         
-        parent::__construct($message, $code, $previous);
+        parent::__construct($errCode ? "{$message}, code: {$errCode}" : $message, $code, $previous);
     }
     
     

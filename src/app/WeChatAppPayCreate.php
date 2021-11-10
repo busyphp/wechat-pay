@@ -56,7 +56,7 @@ class WeChatAppPayCreate extends WeChatPayCreate
             'nonceStr'     => $params['noncestr'],
             'timestamp'    => $params['timestamp'],
             'packageValue' => $params['package'],
-            'sign'         => self::createSign(self::createSignTemp($params, 'sign'), $this->payKey)
+            'sign'         => self::sign(self::temp($params, 'sign'), $this->payKey)
         ];
     }
 }

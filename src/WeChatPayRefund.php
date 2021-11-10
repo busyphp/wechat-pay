@@ -3,7 +3,6 @@
 namespace BusyPHP\wechat\pay;
 
 use BusyPHP\helper\HttpHelper;
-use BusyPHP\helper\StringHelper;
 use BusyPHP\trade\interfaces\PayRefund;
 use BusyPHP\trade\interfaces\PayRefundResult;
 use BusyPHP\trade\model\refund\TradeRefundInfo;
@@ -51,12 +50,6 @@ abstract class WeChatPayRefund extends WeChatPay implements PayRefund
      */
     public function refund() : PayRefundResult
     {
-        $this->params['appid']     = $this->appId;
-        $this->params['mch_id']    = $this->mchId;
-        $this->params['nonce_str'] = StringHelper::random(32);
-        $this->params['sign_type'] = 'MD5';
-        $this->params['sign']      = static::createSign(static::createSignTemp($this->params, 'sign'), $this->payKey);
-        
         $http = new HttpHelper();
         $http->setOpt(CURLOPT_SSLCERT, $this->sslCertPath);
         $http->setOpt(CURLOPT_SSLKEY, $this->sslKeyPath);

@@ -2,8 +2,6 @@
 
 namespace BusyPHP\wechat\pay;
 
-use BusyPHP\helper\StringHelper;
-
 /**
  * 微信支付查询订单接口
  * @author busy^life <busy.life@qq.com>
@@ -45,12 +43,6 @@ abstract class WeChatPayQueryOrder extends WeChatPay
         if (!$this->params['transaction_id'] && !$this->params['out_trade_no']) {
             throw new WeChatPayException('查询交易号不能为空');
         }
-        
-        $this->params['appid']     = $this->appId;
-        $this->params['mch_id']    = $this->mchId;
-        $this->params['nonce_str'] = StringHelper::random(32);
-        $this->params['sign_type'] = 'MD5';
-        $this->params['sign']      = static::createSign(static::createSignTemp($this->params, 'sign'), $this->payKey);
         
         return parent::request();
     }

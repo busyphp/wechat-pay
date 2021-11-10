@@ -5,7 +5,6 @@ namespace BusyPHP\wechat\pay;
 use BusyPHP\trade\interfaces\PayCreate;
 use BusyPHP\trade\interfaces\PayCreateSyncReturn;
 use BusyPHP\trade\model\pay\TradePayInfo;
-use think\helper\Str;
 
 /**
  * 微信支付下单
@@ -86,14 +85,9 @@ abstract class WeChatPayCreate extends WeChatPay implements PayCreate
      */
     public function create()
     {
-        $this->params['appid']            = $this->appId;
-        $this->params['mch_id']           = $this->mchId;
-        $this->params['nonce_str']        = Str::random(32);
         $this->params['spbill_create_ip'] = $this->request->ip();
         $this->params['trade_type']       = $this->tradeType;
-        $this->params['sign_type']        = 'MD5';
         $this->params['device_info']      = $this->deviceInfo;
-        $this->params['sign']             = self::createSign(self::createSignTemp($this->params, 'sign'), $this->payKey);
         
         return $this->request();
     }

@@ -4,12 +4,34 @@ namespace BusyPHP\wechat\pay;
 
 use BusyPHP\App;
 use BusyPHP\helper\HttpHelper;
+use BusyPHP\helper\StringHelper;
 use BusyPHP\Request;
 use BusyPHP\trade\defines\PayType;
+use BusyPHP\wechat\pay\app\WeChatAppPayCreate;
+use BusyPHP\wechat\pay\app\WeChatAppPayNotify;
+use BusyPHP\wechat\pay\app\WeChatAppPayRefund;
+use BusyPHP\wechat\pay\app\WeChatAppPayRefundNotify;
+use BusyPHP\wechat\pay\app\WeChatAppPayRefundQuery;
+use BusyPHP\wechat\pay\h5\WeChatH5PayCreate;
+use BusyPHP\wechat\pay\h5\WeChatH5PayNotify;
+use BusyPHP\wechat\pay\h5\WeChatH5PayRefund;
+use BusyPHP\wechat\pay\h5\WeChatH5PayRefundNotify;
+use BusyPHP\wechat\pay\h5\WeChatH5PayRefundQuery;
 use BusyPHP\wechat\pay\js\WeChatJSPayCreate;
 use BusyPHP\wechat\pay\js\WeChatJSPayNotify;
 use BusyPHP\wechat\pay\js\WeChatJSPayRefund;
 use BusyPHP\wechat\pay\js\WeChatJSPayRefundNotify;
+use BusyPHP\wechat\pay\js\WeChatJsPayRefundQuery;
+use BusyPHP\wechat\pay\mini\WeChatMiniPayCreate;
+use BusyPHP\wechat\pay\mini\WeChatMiniPayNotify;
+use BusyPHP\wechat\pay\mini\WeChatMiniPayRefund;
+use BusyPHP\wechat\pay\mini\WeChatMiniPayRefundNotify;
+use BusyPHP\wechat\pay\mini\WeChatMiniPayRefundQuery;
+use BusyPHP\wechat\pay\native\WeChatNativePayCreate;
+use BusyPHP\wechat\pay\native\WeChatNativePayNotify;
+use BusyPHP\wechat\pay\native\WeChatNativePayRefund;
+use BusyPHP\wechat\pay\native\WeChatNativePayRefundNotify;
+use BusyPHP\wechat\pay\native\WeChatNativePayRefundQuery;
 use BusyPHP\wechat\WeChatConfig;
 use Throwable;
 
@@ -135,12 +157,27 @@ abstract class WeChatPay
     
     
     /**
+     * 初始化参数
+     */
+    protected function initParams()
+    {
+        $this->params['appid']     = $this->appId;
+        $this->params['mch_id']    = $this->mchId;
+        $this->params['nonce_str'] = StringHelper::random(32);
+        $this->params['sign_type'] = 'MD5';
+        $this->params['sign']      = static::sign(static::temp($this->params, 'sign'), $this->payKey);
+    }
+    
+    
+    /**
      * 执行请求
      * @return array
      * @throws WeChatPayException
      */
     protected function request()
     {
+        $this->initParams();
+        
         $http = null;
         if (func_num_args() > 0) {
             $http = func_get_arg(0);
@@ -177,7 +214,7 @@ abstract class WeChatPay
      * @param string $secret 签名密钥
      * @return string
      */
-    protected static function createSign($temp, $secret)
+    protected static function sign($temp, $secret)
     {
         return strtoupper(md5($temp . "&key={$secret}"));
     }
@@ -234,7 +271,7 @@ abstract class WeChatPay
      * @param string|array $filterKeys 要过滤的键名称，多个用逗号隔开
      * @return string 签名
      */
-    protected static function createSignTemp($params, $filterKeys = '')
+    protected static function temp($params, $filterKeys = '')
     {
         if (!is_array($filterKeys)) {
             $filterKeys = explode(',', $filterKeys);
@@ -269,14 +306,102 @@ abstract class WeChatPay
     public static function js(?string $name = null, ?string $alias = null, ?int $client = null) : array
     {
         return [
-            'name'          => $name ?? '公众号支付',
+            'name'          => $name ?? '微信公众号支付',
             'alias'         => $alias ?? '微信',
             'client'        => $client ?? PayType::CLIENT_WECHAT,
             'create'        => WeChatJSPayCreate::class,
             'notify'        => WeChatJSPayNotify::class,
             'refund'        => WeChatJSPayRefund::class,
             'refund_notify' => WeChatJSPayRefundNotify::class,
-            'refund_query'  => AliPcPayRefundQuery::class,
+            'refund_query'  => WeChatJsPayRefundQuery::class,
+        ];
+    }
+    
+    
+    /**
+     * 获取微信H5端接口配置
+     * @param string $name 名称
+     * @param string $alias 别名
+     * @param int    $client 客户端类型
+     * @return array
+     */
+    public static function h5(?string $name = null, ?string $alias = null, ?int $client = null) : array
+    {
+        return [
+            'name'          => $name ?? '微信H5支付',
+            'alias'         => $alias ?? '微信',
+            'client'        => $client ?? PayType::CLIENT_WECHAT,
+            'create'        => WeChatH5PayCreate::class,
+            'notify'        => WeChatH5PayNotify::class,
+            'refund'        => WeChatH5PayRefund::class,
+            'refund_notify' => WeChatH5PayRefundNotify::class,
+            'refund_query'  => WeChatH5PayRefundQuery::class,
+        ];
+    }
+    
+    
+    /**
+     * 获取微信APP端接口配置
+     * @param string $name 名称
+     * @param string $alias 别名
+     * @param int    $client 客户端类型
+     * @return array
+     */
+    public static function app(?string $name = null, ?string $alias = null, ?int $client = null) : array
+    {
+        return [
+            'name'          => $name ?? '微信APP支付',
+            'alias'         => $alias ?? '微信',
+            'client'        => $client ?? PayType::CLIENT_WECHAT,
+            'create'        => WeChatAppPayCreate::class,
+            'notify'        => WeChatAppPayNotify::class,
+            'refund'        => WeChatAppPayRefund::class,
+            'refund_notify' => WeChatAppPayRefundNotify::class,
+            'refund_query'  => WeChatAppPayRefundQuery::class,
+        ];
+    }
+    
+    
+    /**
+     * 获取微信小程序端接口配置
+     * @param string $name 名称
+     * @param string $alias 别名
+     * @param int    $client 客户端类型
+     * @return array
+     */
+    public static function mini(?string $name = null, ?string $alias = null, ?int $client = null) : array
+    {
+        return [
+            'name'          => $name ?? '微信小程序支付',
+            'alias'         => $alias ?? '微信',
+            'client'        => $client ?? PayType::CLIENT_WECHAT,
+            'create'        => WeChatMiniPayCreate::class,
+            'notify'        => WeChatMiniPayNotify::class,
+            'refund'        => WeChatMiniPayRefund::class,
+            'refund_notify' => WeChatMiniPayRefundNotify::class,
+            'refund_query'  => WeChatMiniPayRefundQuery::class,
+        ];
+    }
+    
+    
+    /**
+     * 获取微信网页端接口配置
+     * @param string $name 名称
+     * @param string $alias 别名
+     * @param int    $client 客户端类型
+     * @return array
+     */
+    public static function native(?string $name = null, ?string $alias = null, ?int $client = null) : array
+    {
+        return [
+            'name'          => $name ?? '微信网页支付',
+            'alias'         => $alias ?? '微信',
+            'client'        => $client ?? PayType::CLIENT_WECHAT,
+            'create'        => WeChatNativePayCreate::class,
+            'notify'        => WeChatNativePayNotify::class,
+            'refund'        => WeChatNativePayRefund::class,
+            'refund_notify' => WeChatNativePayRefundNotify::class,
+            'refund_query'  => WeChatNativePayRefundQuery::class,
         ];
     }
 }
