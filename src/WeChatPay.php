@@ -120,13 +120,13 @@ abstract class WeChatPay
         
         $this->app         = App::getInstance();
         $this->request     = $this->app->request;
-        $this->appId       = $this->getConfig($name . 'app_id', '');
-        $this->payKey      = $this->getConfig($name . 'pay_key', '');
-        $this->mchId       = $this->getConfig($name . 'mch_id', '');
-        $this->sslCertPath = $this->getConfig($name . 'ssl_cert_path', '');
-        $this->sslKeyPath  = $this->getConfig($name . 'ssl_key_path', '');
-        $this->caCertPath  = $this->getConfig($name . 'ca_cert_path', '');
-        $this->type        = $this->getConfig($name . 'type', '');
+        $this->appId       = $this->getWeChatConfig($name . 'app_id', '');
+        $this->payKey      = $this->getWeChatConfig($name . 'pay_key', '');
+        $this->mchId       = $this->getWeChatConfig($name . 'mch_id', '');
+        $this->sslCertPath = $this->getWeChatConfig($name . 'ssl_cert_path', '');
+        $this->sslKeyPath  = $this->getWeChatConfig($name . 'ssl_key_path', '');
+        $this->caCertPath  = $this->getWeChatConfig($name . 'ca_cert_path', '');
+        $this->type        = $this->getWeChatConfig($name . 'type', '');
         
         if (!$this->appId) {
             throw new WeChatPayException('没有配置参数: app_id');
