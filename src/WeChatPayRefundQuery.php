@@ -16,7 +16,7 @@ use Exception;
  */
 abstract class WeChatPayRefundQuery extends WeChatPay implements PayRefundQuery
 {
-    protected $apiUrl = 'https://api.mch.weixin.qq.com/secapi/pay/refund';
+    protected $apiUrl = 'https://api.mch.weixin.qq.com/pay/refundquery';
     
     
     /**
@@ -50,6 +50,10 @@ abstract class WeChatPayRefundQuery extends WeChatPay implements PayRefundQuery
                     $notifyResult->setStatus(true);
                     $notifyResult->setApiRefundNo($result['refund_id_0']);
                     $notifyResult->setRefundAccount($result['refund_recv_accout_0']);
+                    
+                    foreach ($result as $key => $value) {
+                        $res->addDetail($key, $value);
+                    }
                 break;
                 
                 // 退款关闭
