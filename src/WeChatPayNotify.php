@@ -68,7 +68,7 @@ abstract class WeChatPayNotify extends WeChatPay implements PayNotify
         $result->setApiTradeNo($this->requestParams['transaction_id']);
         $result->setPayTradeNo($this->tradeNo);
         $result->setApiPrice($this->requestParams['total_fee'] / 100);
-        $result->setAttach($this->requestParams['attach']);
+        $result->setAttach($this->requestParams['attach'] ?? '');
         $result->setPayType($this->type);
         
         return $result;
