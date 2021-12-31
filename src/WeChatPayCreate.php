@@ -37,6 +37,8 @@ abstract class WeChatPayCreate extends WeChatPay implements PayCreate
         $this->params['out_trade_no'] = $tradeInfo->payTradeNo;
         $this->params['total_fee']    = $tradeInfo->price * 100;
         $this->params['body']         = $tradeInfo->title;
+        $this->params['time_start']   = date('YmdHis', $tradeInfo->createTime);
+        $this->params['time_expire']  = date('YmdHis', $tradeInfo->invalidTime);
     }
     
     
