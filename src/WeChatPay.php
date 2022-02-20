@@ -32,7 +32,7 @@ use BusyPHP\wechat\pay\native\WeChatNativePayNotify;
 use BusyPHP\wechat\pay\native\WeChatNativePayRefund;
 use BusyPHP\wechat\pay\native\WeChatNativePayRefundNotify;
 use BusyPHP\wechat\pay\native\WeChatNativePayRefundQuery;
-use BusyPHP\wechat\WeChatConfig;
+use BusyPHP\wechat\WithWeChatConfig;
 use Throwable;
 
 /**
@@ -43,7 +43,7 @@ use Throwable;
  */
 abstract class WeChatPay
 {
-    use WeChatConfig;
+    use WithWeChatConfig;
     
     /**
      * 请求地址
